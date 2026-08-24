@@ -1,8 +1,7 @@
 import { comparePasswords, hashPassword } from "../helper/bcrypt.js";
-import { signToken, verifyToken } from "../helper/jwt.js";
+import { signToken } from "../helper/jwt.js";
 import { User } from "../models/user.models.js";
 import { Profile } from "../models/profile.model.js";
-import jwt from 'jsonwebtoken'
 export const register = async (req,res) => {
     const {first_name,last_name,avatar_url,username,email,password,role} = req.body
  try {
@@ -50,15 +49,7 @@ export const login = async (req,res) => {
                 msg:"Contraseña Incorrecta"
             })
         }
-        const token = jwt.sign({
-            id:user.id,
-            username:user.username,
-            email:user.email,
-        },
-        "mysecret",
-        {
-           expiresIn:"1h" 
-        });
+        const token = signToken(user);
         return res.status(200).json({
             msg:"Usuario Logueado",
             token,
@@ -83,7 +74,7 @@ export const profile = async (req,res) => {
             include:{
                 model:User,
                 as:"User",
-                attributes:{exlude:["password"]}
+                attributes:{exclude:["password"]}
             }
         })
 

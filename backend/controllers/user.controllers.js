@@ -65,7 +65,7 @@ export const updateUser = async (req,res) => {
     try {
         const userId = await User.findByPk(id)
         if(!userId) return res.status(404).json({msg:"id no valido o incorrecto"})
-        const {username,email,password} = req.body
+        const {username,email,password,role} = req.body
         await userId.update({username,email,password,role})
         return res.json({
             msg:"Se actualizaron los datos del usuario",
