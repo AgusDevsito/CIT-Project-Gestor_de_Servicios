@@ -8,6 +8,12 @@ El proyecto de Gestor de Servicios tiene como objetivo principal crear un puente
 
 # Que tenemos pensado hasta ahora:
 Lo primero seria que el usuario pueda loguearse como un trabajador o como un usuario normal.
+
+
 Usuario:El usuario normal posee un login comun con un Nombre,Apellido,DNI,email,etc  una vez registrado el usuario podra acceder a las funcionalidades de solicitar servicio,proponer una problematica,proponer un curso de capacitacion, acceder a un curso de capacitacion y podra ver las patologias,enfermedades y mas apartados de parte de los ganados y cultivos.
+
+
+
+
 CIT:El usuario CIT tendra que loguearse adjuntando un documento que abale el ser un trabajador del CIT,luego de la revision si todo es correcto el trabajador podra acceder a distintas funcionalidades como poder agregar videos,imagenes y explicaciones de como funciona y se ve la patologia o la enfermedad del ganado o del cultivo,tambien podra acceder a la opcion de recomendar alguna problematica propuesta(debido a que es mejor que sea la DRA o un alto mando quien las acepte o rechace),podra modificar los servicios ya sea agregando imagenes o videos, etc.
 
