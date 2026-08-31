@@ -7,12 +7,12 @@ import { routes } from "./router/routes.js";
 dotenv.config();
 const PORT = process.env.PORT || 5432;
 const app = express();
+app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 app.get('/',(req,res) => res.json({ok:true}))
 
 app.use('/api',routes)
-
-app.use(cors());
 
 
 initDB()

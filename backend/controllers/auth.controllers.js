@@ -1,32 +1,50 @@
 import { comparePasswords, hashPassword } from "../helper/bcrypt.js";
 import { signToken } from "../helper/jwt.js";
+import { validateCITRegistration } from "../helper/citRegistration.js";
 import { User } from "../models/user.models.js";
 import { Profile } from "../models/profile.model.js";
 export const register = async (req,res) => {
-    const {first_name,last_name,avatar_url,username,email,password,role} = req.body
- try {
-    const hased = await hashPassword(password)
-    const user = await User.create({
-        username: username,
-        email: email,
-        password: hased,
-        role:role,
-    })
-    await Profile.create({
-        user_id:user.id,
-        first_name:first_name,
-        last_name:last_name,
-        avatar_url:avatar_url,
-    })
-    res.status(200).json({
-        msg:"Usuario Registrado"
-    })
- } catch (error) {
-    console.error(error)
-    res.status(500).json({
-        msg:"Error interno del servidor"
-    })
- }   
+    const {first_name,last_name,avatar_url,username,email,password,role,document_url} = req.body;
+    const uploadedFile = req.file;
+    const resolvedDocumentUrl = uploadedFile ? `/uploads/${uploadedFile.filename}` : document_url;
+
+    try {
+        validateCITRegistration({
+            role,
+            documentUrl: resolvedDocumentUrl,
+            file: uploadedFile,
+        });
+
+        const hased = await hashPassword(password)
+        const user = await User.create({
+            username: username,
+            email: email,
+            password: hased,
+            role: role,
+            document_url: resolvedDocumentUrl || null,
+            document_name: uploadedFile ? uploadedFile.originalname : null,
+        })
+        await Profile.create({
+            user_id:user.id,
+            first_name:first_name,
+            last_name:last_name,
+            avatar_url:avatar_url,
+        })
+        res.status(200).json({
+            msg:"Usuario Registrado",
+            document_url: resolvedDocumentUrl,
+        })
+    } catch (error) {
+        console.error(error)
+        if (error.code === "DOCUMENT_REQUIRED") {
+            return res.status(400).json({
+                msg: error.message,
+            })
+        }
+        res.status(500).json({
+            msg:"Error interno del servidor"
+        })
+    }   
 }
 export const login = async (req,res) => {
     const {username,password} = req.body
