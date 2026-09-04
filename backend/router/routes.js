@@ -1,8 +1,11 @@
 import { Router } from "express";
-import { authRouter } from "./auth.route.js";
-import { userRouter } from "./user.route.js";
+import { authRouter } from "./auth.routes.js";
+import { userRouter } from "./user.routes.js";
+import { propuestasRoute } from "./propuestas.routes.js";
 
 export const routes =  Router();
 
 routes.use("/",authRouter);
 routes.use("/",userRouter);
+routes.use("/", propuestasRoute)
+

@@ -12,7 +12,7 @@ export const signToken = (user) => {
         throw new Error("JWT_SECRET no está definido en las variables de entorno");
     }
     return jwt.sign(
-        { id: user.id, email: user.email },
+        { id: user.id, email: user.email, role: user.role },
         process.env.JWT_SECRET,
         { expiresIn: "1h" }
     );

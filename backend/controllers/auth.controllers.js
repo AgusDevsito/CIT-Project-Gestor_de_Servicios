@@ -8,6 +8,11 @@ export const register = async (req,res) => {
     const uploadedFile = req.file;
     const resolvedDocumentUrl = uploadedFile ? `/uploads/${uploadedFile.filename}` : document_url;
 
+    const requiredFields = { first_name, last_name, username, email, password, role };
+    if (Object.entries(requiredFields).some(([, value]) => !String(value ?? '').trim())) {
+        return res.status(400).json({ msg: "Todos los campos obligatorios deben estar completos." });
+    }
+
     try {
         validateCITRegistration({
             role,
@@ -48,6 +53,9 @@ export const register = async (req,res) => {
 }
 export const login = async (req,res) => {
     const {username,password} = req.body
+    if (!String(username ?? '').trim() || !String(password ?? '').trim()) {
+        return res.status(400).json({ msg: "El usuario y la contraseña son obligatorios." });
+    }
     try {
         const user = await User.findOne({
             where:{

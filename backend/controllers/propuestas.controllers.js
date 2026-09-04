@@ -1,12 +1,9 @@
 import { Propuestas } from "../models/propuesta.model.js";
 
-
-
-// 1. Crear propuesta agropecuaria
 export const crearPropuesta = async (req, res) => {
   try {
     const { titulo, sector, problematica } = req.body;
-    const solicitanteId = req.user.id; // Obtenido del token
+    const solicitante = req.user.id;
 
     if (!titulo || !sector || !problematica) {
       return res.status(400).json({
@@ -19,8 +16,8 @@ export const crearPropuesta = async (req, res) => {
       titulo,
       sector,
       problematica,
-      solicitanteId,
-      estado: 'PENDIENTE',
+      solicitante,
+      estado: 'Pendiente',
     });
 
     return res.status(201).json({
@@ -33,12 +30,10 @@ export const crearPropuesta = async (req, res) => {
     return res.status(500).json({ ok: false, msg: 'Error interno al registrar la propuesta.' });
   }
 };
-
-// 2. Obtener solicitudes para el CIT
 export const obtenerPendientesCIT = async (req, res) => {
   try {
     const pendientes = await Propuestas.findAll({
-      where: { estado: 'PENDIENTE' },
+      where: { estado: 'Pendiente' },
       order: [['createdAt', 'DESC']],
     });
 
@@ -52,15 +47,14 @@ export const obtenerPendientesCIT = async (req, res) => {
     return res.status(500).json({ ok: false, msg: 'Error al consultar propuestas.' });
   }
 };
-
-// 3. Revisión y resolución del evaluador CIT
 export const dictaminarPropuestaCIT = async (req, res) => {
   try {
     const { id } = req.params;
     const { decision, justificacion } = req.body;
-    const citRevisorId = req.user.id;
+    const cirRevisorId = req.user.id;
+    const estadoDecision = decision === 'APROBADO' ? 'Aprobado' : 'Rechazado';
 
-    // Validación de entrada
+    
     if (!['APROBADO', 'RECHAZADO'].includes(decision)) {
       return res.status(400).json({
         ok: false,
@@ -81,17 +75,17 @@ export const dictaminarPropuestaCIT = async (req, res) => {
       return res.status(404).json({ ok: false, msg: 'Propuesta no encontrada.' });
     }
 
-    if (propuesta.estado !== 'PENDIENTE') {
+    if (propuesta.estado !== 'Pendiente') {
       return res.status(409).json({
         ok: false,
         msg: `La propuesta ya fue dictaminada previamente con estado: ${propuesta.estado}.`,
       });
     }
 
-    // Actualización de estado y firma del revisor
-    propuesta.estado = decision;
+    
+    propuesta.estado = estadoDecision;
     propuesta.citJustificacion = justificacion.trim();
-    propuesta.citRevisorId = citRevisorId;
+    propuesta.cirRevisorId = cirRevisorId;
     propuesta.citFechaRevision = new Date();
 
     await propuesta.save();
