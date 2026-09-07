@@ -9,9 +9,9 @@ export const Propuestas = sequelize.define("Propuesta",{
     }},
     estado:{type:DataTypes.ENUM("Pendiente","Aprobado","Rechazado"),defaultValue:"Pendiente",allowNull:false},
     solicitante:{type:DataTypes.INTEGER,allowNull:false},
-    cirRevisorId:{type:DataTypes.INTEGER,allowNull:false,defaultValue:null},
-    citJustificacion:{type:DataTypes.TEXT,allowNull:false,defaultValue:null},
-    citFechaRevision:{type:DataTypes.TEXT,allowNull:false,defaultValue:null},   
+    cirRevisorId:{type:DataTypes.INTEGER,defaultValue:null},
+    citJustificacion:{type:DataTypes.TEXT,defaultValue:null},
+    citFechaRevision:{type:DataTypes.TEXT,defaultValue:null},   
 },{
     timestamps:true,
 }
