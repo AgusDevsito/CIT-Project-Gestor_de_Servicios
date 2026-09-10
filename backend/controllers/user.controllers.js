@@ -1,4 +1,6 @@
 import { User } from "../models/user.models.js";
+import { Profile } from "../models/profile.model.js";
+import { hashPassword } from "../helper/bcrypt.js";
 
 export const createUser = async (req,res) => {
     try {
@@ -6,7 +8,7 @@ export const createUser = async (req,res) => {
     if (!username || !email || !password){
         return res.status(500).json({msg:"El username,email y password son obligatorios"})
     }
-    const newUser = await User.create({username,email,password,role})
+    const newUser = await User.create({username,email,password:await hashPassword(password),role})
     return res.status(200).json({
         msg:"Usuario creado exitosamente",
         data:newUser
@@ -21,7 +23,10 @@ export const createUser = async (req,res) => {
 }
 export const getallUsers = async (req,res) => {
     try {
-        const users = await User.findAll()
+        const users = await User.findAll({
+            attributes: { exclude: ["password"] },
+            include: { model: Profile, as: "Profile" },
+        })
         res.json({
             count:users.length,
             data:users
@@ -42,7 +47,10 @@ export const getUserbyID = async (req,res) => {
         })
     }
     try {
-        const users = await User.findByPk(id)
+        const users = await User.findByPk(id, {
+            attributes: { exclude: ["password"] },
+            include: { model: Profile, as: "Profile" },
+        })
         if(!users) return res.status(404).json({msg:"usuario no encontrado"})
         return res.json({
             data:users
@@ -66,10 +74,12 @@ export const updateUser = async (req,res) => {
         const userId = await User.findByPk(id)
         if(!userId) return res.status(404).json({msg:"id no valido o incorrecto"})
         const {username,email,password,role} = req.body
-        await userId.update({username,email,password,role})
+        const userData = {username,email,role}
+        if (password) userData.password = await hashPassword(password)
+        await userId.update(userData)
         return res.json({
             msg:"Se actualizaron los datos del usuario",
-            data:userId
+            data: { id: userId.id, username: userId.username, email: userId.email, role: userId.role }
         })
     } catch (error) {
         console.error(error)
@@ -87,7 +97,7 @@ export const deleteUser = async (req,res) => {
         await user.destroy()
         res.json({
             msg:"usuario eliminado",
-            data:user
+            data: { id: user.id, username: user.username, email: user.email, role: user.role }
         })
     } catch (error) {
         console.error(error)

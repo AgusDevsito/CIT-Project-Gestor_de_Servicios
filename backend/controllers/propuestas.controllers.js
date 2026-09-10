@@ -1,4 +1,19 @@
 import { Propuestas } from "../models/propuesta.model.js";
+import { User } from "../models/user.models.js";
+
+// Cada propuesta muestra al solicitante y, si existe, al revisor CIT.
+const propuestaIncludes = [
+  {
+    model: User,
+    as: 'Solicitante',
+    attributes: { exclude: ['password'] },
+  },
+  {
+    model: User,
+    as: 'Revisor',
+    attributes: { exclude: ['password'] },
+  },
+];
 
 export const crearPropuesta = async (req, res) => {
   try {
@@ -34,6 +49,7 @@ export const obtenerPendientesCIT = async (req, res) => {
   try {
     const pendientes = await Propuestas.findAll({
       where: { estado: 'Pendiente' },
+      include: propuestaIncludes,
       order: [['createdAt', 'DESC']],
     });
 
@@ -69,7 +85,9 @@ export const dictaminarPropuestaCIT = async (req, res) => {
       });
     }
 
-    const propuesta = await Propuestas.findByPk(id);
+    const propuesta = await Propuestas.findByPk(id, {
+      include: propuestaIncludes,
+    });
 
     if (!propuesta) {
       return res.status(404).json({ ok: false, msg: 'Propuesta no encontrada.' });

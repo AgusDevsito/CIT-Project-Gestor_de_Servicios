@@ -15,7 +15,7 @@ export const Publicaciones = sequelize.define("Publicaciones",{
 
 //Relacion con usuario 
 User.hasMany(Publicaciones,{foreignKey:"author_id",as:"Publicaciones"})
-Publicaciones.belongsTo(User,{foreignKey:"author_id"})
+Publicaciones.belongsTo(User,{foreignKey:"author_id",as:"Autor"})
 
 //Relacion con Archivo
 Publicaciones.hasMany(ArchivoPublicacion,{foreignKey:"publicacion_id",as:"Archivo"})

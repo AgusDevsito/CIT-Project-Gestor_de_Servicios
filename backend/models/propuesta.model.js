@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/db.js";
+import { User } from "./user.models.js";
 
 export const Propuestas = sequelize.define("Propuesta",{
     titulo:{type:DataTypes.STRING,allowNull:false,validate:{msg:"La propuesta debe tener un titulo"}},
@@ -16,3 +17,11 @@ export const Propuestas = sequelize.define("Propuesta",{
     timestamps:true,
 }
 )
+
+// Una propuesta pertenece al usuario que la solicita.
+User.hasMany(Propuestas,{foreignKey:"solicitante",as:"PropuestasSolicitadas"})
+Propuestas.belongsTo(User,{foreignKey:"solicitante",as:"Solicitante"})
+
+// Una propuesta tambien puede guardar el usuario CIT que la reviso.
+User.hasMany(Propuestas,{foreignKey:"cirRevisorId",as:"PropuestasRevisadas"})
+Propuestas.belongsTo(User,{foreignKey:"cirRevisorId",as:"Revisor"})
