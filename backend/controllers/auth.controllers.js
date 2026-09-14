@@ -3,16 +3,23 @@ import { signToken } from "../helper/jwt.js";
 import { validateCITRegistration } from "../helper/citRegistration.js";
 import { User } from "../models/user.models.js";
 import { Profile } from "../models/profile.model.js";
+import { sequelize } from "../config/db.js";
 export const register = async (req,res) => {
-    const {first_name,last_name,avatar_url,username,email,password,role,document_url} = req.body;
+    const {first_name,last_name,avatar_url,username,email,password,role: requestedRole,document_url} = req.body;
     const uploadedFile = req.file;
     const resolvedDocumentUrl = uploadedFile ? `/uploads/${uploadedFile.filename}` : document_url;
+    const role = requestedRole || "user";
 
     const requiredFields = { first_name, last_name, username, email, password, role };
     if (Object.entries(requiredFields).some(([, value]) => !String(value ?? '').trim())) {
         return res.status(400).json({ msg: "Todos los campos obligatorios deben estar completos." });
     }
 
+    if (!["user", "cit"].includes(role)) {
+        return res.status(400).json({ msg: "El rol solicitado no es válido." });
+    }
+
+    let transaction;
     try {
         validateCITRegistration({
             role,
@@ -21,6 +28,7 @@ export const register = async (req,res) => {
         });
 
         const hased = await hashPassword(password)
+        transaction = await sequelize.transaction();
         const user = await User.create({
             username: username,
             email: email,
@@ -28,18 +36,20 @@ export const register = async (req,res) => {
             role: role,
             document_url: resolvedDocumentUrl || null,
             document_name: uploadedFile ? uploadedFile.originalname : null,
-        })
+        }, { transaction })
         await Profile.create({
             user_id:user.id,
             first_name:first_name,
             last_name:last_name,
             avatar_url:avatar_url,
-        })
+        }, { transaction })
+        await transaction.commit();
         res.status(200).json({
             msg:"Usuario Registrado",
             document_url: resolvedDocumentUrl,
         })
     } catch (error) {
+        if (transaction) await transaction.rollback();
         console.error(error)
         if (error.code === "DOCUMENT_REQUIRED") {
             return res.status(400).json({
@@ -95,8 +105,8 @@ export const logout = async (req,res) => {
 }
 export const profile = async (req,res) => {
     try {
-        console.log(req.userLogged)
-        const userProfile = await Profile.findByPk(req.userLogged.id,{
+        const userProfile = await Profile.findOne({
+            where: { user_id: req.userLogged.id },
             include:{
                 model:User,
                 as:"User",
@@ -104,7 +114,6 @@ export const profile = async (req,res) => {
             }
         })
 
-        console.log({userProfile})
         if(!userProfile){
             return res.status(404).json(userProfile)       
      }

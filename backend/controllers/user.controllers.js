@@ -6,12 +6,17 @@ export const createUser = async (req,res) => {
     try {
         const {username,email,password,role} = req.body;
     if (!username || !email || !password){
-        return res.status(500).json({msg:"El username,email y password son obligatorios"})
+        return res.status(400).json({msg:"El username,email y password son obligatorios"})
     }
     const newUser = await User.create({username,email,password:await hashPassword(password),role})
-    return res.status(200).json({
+    return res.status(201).json({
         msg:"Usuario creado exitosamente",
-        data:newUser
+        data: {
+            id: newUser.id,
+            username: newUser.username,
+            email: newUser.email,
+            role: newUser.role,
+        }
     })
     } catch (error) {
         console.error(error)
@@ -74,7 +79,8 @@ export const updateUser = async (req,res) => {
         const userId = await User.findByPk(id)
         if(!userId) return res.status(404).json({msg:"id no valido o incorrecto"})
         const {username,email,password,role} = req.body
-        const userData = {username,email,role}
+        const userData = {username,email}
+        if (role !== undefined) userData.role = role
         if (password) userData.password = await hashPassword(password)
         await userId.update(userData)
         return res.json({

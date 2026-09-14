@@ -9,4 +9,4 @@ export const authRouter = Router();
 authRouter.post("/register", uploadDocument.single("document"), register);
 authRouter.post("/login",login);
 authRouter.get("/profile",requireAuth,profile);
-authRouter.post("/logout",logout)
+authRouter.post("/logout", requireAuth, logout)
