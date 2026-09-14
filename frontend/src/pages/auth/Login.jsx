@@ -1,4 +1,6 @@
 import {useState} from 'react';
+import './Login.css';
+import logoCitio from '../../assets/logo-CITio.png';
 import {loginUser} from '../../services/authService';
 
 export const Login = () =>{
@@ -14,108 +16,96 @@ export const Login = () =>{
     
         try{
             const data = await loginUser (email,password);
-    
+            localStorage.setItem('tolken', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            alert(`Bienvenido a CITio, ${data.user.name || 'usuario'}`);
         } catch {
             setError(error.message);
         } finally {
             setLoading(false);
         }
     };
+
     return (
-        <div style={styles.container}>
-          <div style={styles.card}>
-            <h2 style={styles.title}>CITio - Iniciar Sesión</h2>
-            <p style={styles.subtitle}>Plataforma de Servicios y Proyectos</p>
-    
-            {/* Renderizado condicional del mensaje de error */}
-            {error && <div style={styles.errorAlert}>{error}</div>}
-    
-            <form onSubmit={handleSubmit} style={styles.form}>
-              <div style={styles.inputGroup}>
-                <label style={styles.label}>Correo Electrónico:</label>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="ejemplo@correo.com"
-                  style={styles.input}
-                />
-              </div>
-    
-              <div style={styles.inputGroup}>
-                <label style={styles.label}>Contraseña:</label>
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  style={styles.input}
-                />
-              </div>
-    
-              <button 
-                type="submit" 
-                disabled={loading} 
-                style={loading ? { ...styles.button, ...styles.buttonDisabled } : styles.button}
-              >
-                {loading ? 'Ingresando...' : 'Iniciar Sesión'}
-              </button>
-            </form>
-          </div>
+    <div className="space-container">
+      {/* Capas del fondo espacial */}
+      <div id="stars" />
+      <div id="stars2" />
+      <div id="stars3" />
+
+      {/* contenedor central */}
+      <div className="login-wrapper">
+      
+      {/*  Contenedor del Logo */}
+        <div className="logo-container">
+          <img 
+            src={logoCitio} 
+            alt="Logo CITio" 
+            className="login-logo"
+          />
         </div>
-      );
-    };
-    const styles = {
-      container: {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        backgroundColor: '#f4f6f8',
-        fontFamily: 'Arial, sans-serif'
-      },
-      card: {
-        backgroundColor: '#ffffff',
-        padding: '2rem',
-        borderRadius: '8px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        width: '100%',
-        maxWidth: '400px'
-      },
-      title: { margin: '0 0 0.5rem 0', color: '#1a365d', textAlign: 'center' },
-      subtitle: { margin: '0 0 1.5rem 0', color: '#718096', textAlign: 'center', fontSize: '0.9rem' },
-      errorAlert: {
-        backgroundColor: '#fed7d7',
-        color: '#9b2c2c',
-        padding: '0.75rem',
-        borderRadius: '4px',
-        marginBottom: '1rem',
-        fontSize: '0.875rem'
-      },
-      form: { display: 'flex', flexDirection: 'column', gap: '1rem' },
-      inputGroup: { display: 'flex', flexDirection: 'column', gap: '0.25rem' },
-      label: { fontSize: '0.875rem', color: '#2d3748', fontWeight: 'bold' },
-      input: {
-        padding: '0.6rem',
-        borderRadius: '4px',
-        border: '1px solid #cbd5e0',
-        fontSize: '1rem'
-      },
-      button: {
-        padding: '0.75rem',
-        backgroundColor: '#2b6cb0',
-        color: '#ffffff',
-        border: 'none',
-        borderRadius: '4px',
-        fontSize: '1rem',
-        fontWeight: 'bold',
-        cursor: 'pointer',
-        marginTop: '0.5rem'
-      },
-      buttonDisabled: {
-        backgroundColor: '#a0aec0',
-        cursor: 'not-allowed'
-      }
+        
+      {/*  Formulario con estilo Dark Inset */}
+      <form className="form-card" onSubmit={handleSubmit}>
+        <p className="heading">Iniciar Sesión</p>
+
+        {/* Mensaje de error si las credenciales fallan */}
+        {error && <div className="error-badge">{error}</div>}
+
+        {/* Campo de Correo / Usuario */}
+        <div className="field">
+          <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+            <path d="M13.106 7.222c0-2.967-2.249-5.032-5.482-5.032-3.35 0-5.646 2.318-5.646 5.702 0 3.493 2.235 5.708 5.762 5.708.862 0 1.689-.123 2.304-.335v-.862c-.43.199-1.354.328-2.29.328-2.926 0-4.813-1.88-4.813-4.798 0-2.844 1.921-4.881 4.594-4.881 2.735 0 4.608 1.688 4.608 4.156 0 1.682-.554 2.769-1.416 2.769-.492 0-.772-.28-.772-.76V5.206H8.923v.834h-.11c-.266-.595-.881-.964-1.6-.964-1.4 0-2.378 1.162-2.378 2.823 0 1.737.957 2.906 2.379 2.906.8 0 1.415-.39 1.709-1.087h.11c.081.67.703 1.148 1.503 1.148 1.572 0 2.57-1.415 2.57-3.643zm-7.177.704c0-1.197.54-1.907 1.456-1.907.93 0 1.524.738 1.524 1.907S8.308 9.84 7.371 9.84c-.895 0-1.442-.725-1.442-1.914z"/>
+          </svg>
+          <input
+            type="email"
+            required
+            autoComplete="off"
+            placeholder="Correo institucional / usuario"
+            className="input-field"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+        {/* Campo de Contraseña */}
+        <div className="field">
+          <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+            <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+          </svg>
+          <input
+            type="password"
+            required
+            placeholder="Contraseña"
+            className="input-field"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+
+        {/* Botones de Acción */}
+        <div className="btn-group">
+          <button type="submit" className="button1" disabled={loading}>
+            {loading ? 'Ingresando...' : 'Iniciar Sesión'}
+          </button>
+          <button
+            type="button"
+            className="button2"
+            onClick={() => alert('Próximamente: Redirigir a Registro')}
+          >
+            Registrarse
+          </button>
+        </div>
+
+        <button
+          type="button"
+          className="button3"
+          onClick={() => alert('Próximamente: Recuperar Contraseña')}
+        >
+          ¿Olvidaste tu contraseña?
+        </button>
+      </form>
+      </div>
+    </div>
+  );
 };
