@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {loginUser, LoginUser} from '../../services/authService';
+import {loginUser} from '../../services/authService';
 
 export const Login = () =>{
     const [email, setEmail] = useState('');
@@ -13,7 +13,7 @@ export const Login = () =>{
         setLoading(true);
     
         try{
-            const data = await loginUser {email,password};
+            const data = await loginUser (email,password);
     
         } catch {
             setError(error.message);
@@ -118,4 +118,4 @@ export const Login = () =>{
         backgroundColor: '#a0aec0',
         cursor: 'not-allowed'
       }
-    };
+};
